@@ -11,6 +11,24 @@ export default defineConfig({
     },
     server: {
         port: 3000,
-        open: true
+        open: true,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3001',
+                changeOrigin: true
+            }
+        }
+    },
+    build: {
+        outDir: 'dist',
+        sourcemap: false,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['vue', 'vue-router', 'pinia'],
+                    ui: ['lucide-vue-next', 'radix-vue']
+                }
+            }
+        }
     }
 }) 

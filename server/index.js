@@ -3,9 +3,15 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import fetch from 'node-fetch'
 import rateLimit from 'express-rate-limit'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 // Load environment variables
 dotenv.config()
+
+// ES modules __dirname equivalent
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -16,7 +22,7 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps, curl requests, etc.)
     if (!origin) return callback(null, true)
     
-    // List of allowed origins for development
+    // List of allowed origins
     const allowedOrigins = [
       process.env.CLIENT_URL || 'http://localhost:5173',
       'http://localhost:3000',
@@ -24,8 +30,17 @@ const corsOptions = {
       'http://localhost:4173', // Vite preview
       'http://127.0.0.1:5173',
       'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001'
+      'http://127.0.0.1:3001',
+      // Production domains
+      'https://owner-app.onrender.com',
+      'https://owner-app.render.com'
     ]
+    
+    // In production, also allow requests from the same domain
+    if (process.env.NODE_ENV === 'production') {
+      const host = process.env.RENDER_EXTERNAL_URL || `https://owner-app.onrender.com`
+      allowedOrigins.push(host)
+    }
     
     if (allowedOrigins.includes(origin)) {
       callback(null, true)
@@ -279,13 +294,23 @@ app.post('/api/slack/test', testLimiter, async (req, res) => {
   }
 })
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found',
-    path: req.originalUrl
-  })
+// Serve static files from the dist directory (built frontend)
+const distPath = path.join(__dirname, '..', 'dist')
+app.use(express.static(distPath))
+
+// SPA fallback - serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/') || req.path.startsWith('/health')) {
+    return res.status(404).json({
+      success: false,
+      error: 'API endpoint not found',
+      path: req.originalUrl
+    })
+  }
+  
+  // Serve index.html for SPA routes
+  res.sendFile(path.join(distPath, 'index.html'))
 })
 
 // Error handler
