@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
+    "build:no-check": "vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
     "server:install": "cd server && npm install",

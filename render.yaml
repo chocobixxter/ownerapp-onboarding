@@ -3,15 +3,13 @@ services:
     name: owner-app
     env: node
     plan: free
-    buildCommand: npm install && npm run build && cd server && npm install --production
+    buildCommand: npm ci && npm run build && cd server && npm install --only=production
     startCommand: cd server && npm start
-    healthCheckPath: /
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
       - key: SLACK_WEBHOOK_URL
-        sync: false
-    domains:
-      - owner-app.onrender.com 
+        sync: false 
