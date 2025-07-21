@@ -49,9 +49,10 @@
 
 ### Частые проблемы:
 
-**❌ `vue-tsc: not found`**
-- Решение: используется `npm ci` для установки всех зависимостей
-- Альтернатива: поменять в `render.yaml` команду на `npm run build:no-check`
+**❌ `vue-tsc: not found` или `vite: not found`**
+- Проблема: Render игнорирует `devDependencies` в production режиме
+- Решение: критически важные для сборки пакеты перенесены в `dependencies`
+- Используется `npm run build:no-check` (без TypeScript проверки)
 
 **❌ CORS ошибки**
 - Проверьте, что домен добавлен в allowed origins в `server/index.js`
