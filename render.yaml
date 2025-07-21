@@ -3,7 +3,7 @@ services:
     name: owner-app
     env: node
     plan: free
-    buildCommand: npm ci && npm run build:no-check && cd server && npm install --only=production
+    buildCommand: npm ci && VITE_BFF_URL=https://owner-app.onrender.com npm run build:no-check && cd server && npm install --only=production
     startCommand: cd server && npm start
     healthCheckPath: /health
     envVars:

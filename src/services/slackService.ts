@@ -22,7 +22,16 @@ class SlackService {
     private readonly bffUrl: string
 
     constructor() {
-        this.bffUrl = import.meta.env.VITE_BFF_URL || 'http://localhost:3001'
+        // Use environment-aware URL configuration
+        if (import.meta.env.VITE_BFF_URL) {
+            this.bffUrl = import.meta.env.VITE_BFF_URL
+        } else if (import.meta.env.PROD) {
+            // In production, use the same domain (both frontend and backend are served together)
+            this.bffUrl = window.location.origin
+        } else {
+            // In development, use localhost
+            this.bffUrl = 'http://localhost:3001'
+        }
     }
 
     /**
