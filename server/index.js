@@ -124,8 +124,8 @@ const testLimiter = rateLimit({
   }
 })
 
-// Apply general rate limiting to all requests
-app.use(generalLimiter)
+// Apply general rate limiting to API requests only (exclude health checks and static files)
+app.use('/api/', generalLimiter)
 
 // Health check endpoint
 app.get('/health', (req, res) => {
